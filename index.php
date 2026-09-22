@@ -14,25 +14,43 @@ function listarLivros($con){
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
+function filtrarAutor($con){
+    header("Content-Type: application/json; charset=utf-8");
+    $nome = $_GET["nome"] ?? "";
+    $stmt = $con->prepare("SELECT * FROM livros WHERE autorLIvro = ?");
+    $stmt->execute([$nome]);
+    echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+}
+
 function adicionarLivros($con){
     $autorLivro = $_POST["autorLivro"] ?? "";
-    $descricaoLivro = $_POST["descricaoLIvro"] ?? "";
+    $descricaoLivro = $_POST["descricaoLivro"] ?? "";
+    $anoPublicacao = $_POST["anoPublicacao"] ?? "";
 
  try {
-    $stmt =$con->prepare("INSERT INTO livros (autorLivro,
-    descricaoLivro) VALUES (?,?)");
-    $stmt -> execute([$autorLivro, $descricaoLivro]);
-    header("location: ../font/index.html");
-}catch(PDOException $e){
-    header("Location: ../front/erro.html");
-}
-exist;
+        $stmt = $con->prepare("INSERT INTO livros 
+        (autorLivro, descricaoLivro, anoPublicacao) 
+        VALUES (?, ?, ?)");
+
+        $stmt->execute([
+            $autorLivro,
+            $descricaoLivro,
+            $anoPublicacao
+        ]);
+
+        header("Location: ../front/index.html");
+
+    } catch(PDOException $e){
+        header("Location: ../front/erro.html");
+    }
 }
 
 if($_SERVER["REQUEST_METHOD"] === "POST"){
     adicionarLivros($con);
-}elseif ($rota === "livros"){
+}elseif ($rota === "listar/livros"){
     listarLivros($con);
+    }elseif ($rota === "filtrar/autor"){
+        filtrarAutor($con);
 }else {
     teste();
 }
